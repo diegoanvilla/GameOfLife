@@ -8,6 +8,9 @@ public class Game : MonoBehaviour
     private static int SCREEN_WIDTH = 100;
     private static int SCREEN_HEIGHT = 100;
 
+    public bool simulationEnable = false;
+
+
     public float speed = 0.1f;
     private float timer = 0;
 
@@ -22,6 +25,8 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UserInput();
+        if(!simulationEnable) return;
         if(timer>=speed){
             timer=0f;
             CountNeighbros();
@@ -40,6 +45,24 @@ public class Game : MonoBehaviour
                 grid[x, y].SetAlive(GetRandomAliveCell());
                 
             }
+        }
+    }
+
+       void UserInput()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 mousePoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            int x = Mathf.RoundToInt(mousePoint.x);
+            int y = Mathf.RoundToInt(mousePoint.y);
+
+                if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
+            {
+                grid[x, y].SetAlive(!grid[x, y].isAlive);
+            }
+        }
+        if(Input.GetKeyUp(KeyCode.P)){
+            simulationEnable = !simulationEnable;
         }
     }
 
