@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.IO;
+using UnityEditor;
 public class Game : MonoBehaviour
 {
 
@@ -19,7 +20,7 @@ public class Game : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlaceCells();
+        PlaceCells(false);
     }
 
     // Update is called once per frame
@@ -35,14 +36,14 @@ public class Game : MonoBehaviour
             timer+= Time.deltaTime;
         }
     }
-    void PlaceCells (){
+    void PlaceCells (bool rand){
         for (int y = 0; y < SCREEN_HEIGHT; y++)
         {
             for (int x = 0; x < SCREEN_WIDTH; x++)
             {
                 Cell cell = Instantiate(Resources.Load("Prefabs/Cell", typeof(Cell)), new Vector2(x, y), Quaternion.identity) as Cell;
                 grid[x, y] = cell;
-                grid[x, y].SetAlive(GetRandomAliveCell());
+                grid[x, y].SetAlive(rand?GetRandomAliveCell():false);
                 
             }
         }
@@ -63,6 +64,58 @@ public class Game : MonoBehaviour
         }
         if(Input.GetKeyUp(KeyCode.P)){
             simulationEnable = !simulationEnable;
+        }
+        if(Input.GetKeyUp(KeyCode.W)){
+            WriteGrid();
+        }
+        if(Input.GetKeyUp(KeyCode.R)){
+            PlaceCells(true);
+        }
+        if(Input.GetKeyUp(KeyCode.A)){
+            ReadGrid("Assets/Resources/grid.txt");
+        }
+        if(Input.GetKeyUp(KeyCode.O)){
+            ReadGrid("Assets/Resources/osciladores.txt");
+        }
+        if(Input.GetKeyUp(KeyCode.E)){
+            ReadGrid("Assets/Resources/estaticos.txt");
+        }   
+        if(Input.GetKeyUp(KeyCode.N)){
+            ReadGrid("Assets/Resources/naves.txt");
+        }
+        if(Input.GetKeyUp(KeyCode.M)){
+            ReadGrid("Assets/Resources/matusalenes.txt");
+        }
+    }
+
+    void WriteGrid(){
+        Debug.Log("Creando");
+        StreamWriter writer = new StreamWriter("Assets/Resources/grid.txt", false);
+        for (int y = 0; y < SCREEN_HEIGHT; y++)
+        {
+            for (int x = 0; x < SCREEN_WIDTH; x++)
+            {
+                writer.Write(grid[x, y].isAlive?1:0);
+            }
+            writer.WriteLine();
+        }
+        writer.Close();
+        Debug.Log("Listo");
+    }
+
+    void ReadGrid(string path){
+        string[] lines = File.ReadAllLines(path);
+        for (int y = 0; y < SCREEN_HEIGHT; y++)
+        {
+            char[] values = lines[y].ToCharArray();
+            for (int x = 0; x < SCREEN_WIDTH; x++)
+            {
+                if(values[x]=='1'){
+                    grid[x, y].SetAlive(true);
+                }else{
+                    grid[x, y].SetAlive(false);
+                }
+            }
         }
     }
 
